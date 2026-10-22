@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CAREEM_MCP_URL=http://careem-mock:8787/mcp
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - careem-mock
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  # Careem MCP Local Mock Sandbox (http://127.0.0.1:8787/mcp)
+  careem-mock:
+    image: node:20-alpine
+    command: sh -c "echo 'Careem MCP Mock Server container placeholder' && tail -f /dev/null"
+    ports:
+      - "8787:8787"
